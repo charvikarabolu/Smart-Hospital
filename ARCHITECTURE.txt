@@ -1,0 +1,256 @@
+SMART HOSPITAL PATIENT QUEUE MANAGEMENT SYSTEM
+ARCHITECTURE DOCUMENT
+=============================================
+
+1. SYSTEM SUMMARY
+-----------------
+The application is a modular, menu-driven C program that demonstrates basic
+hospital record management and patient queue handling. Each major responsibility
+is separated into a source file and a corresponding header file.
+
+The system is intended for learning and demonstration. It is not a production
+clinical system and must not be used to make real medical decisions.
+
+2. HIGH-LEVEL ARCHITECTURE
+--------------------------
+
+                 +----------------------+
+                 |        app.c         |
+                 | Program entry point  |
+                 +----------+-----------+
+                            |
+                            v
+                 +----------------------+
+                 |     hospital.c      |
+                 | Main state and menu  |
+                 +----------+-----------+
+                            |
+       +--------------------+--------------------+
+       |                    |                    |
+       v                    v                    v
++---------------+   +----------------+   +------------------+
+| Patient       |   | Doctor         |   | Waiting Room     |
+| Records       |   | Registry       |   | Circular FIFO    |
++---------------+   +----------------+   +------------------+
+       |                                         |
+       v                                         v
++---------------+                       +------------------+
+| Search /      |                       | Emergency Room   |
+| Sorting       |                       | Priority Queue   |
++---------------+                       +------------------+
+       |
+       v
++----------------------------------------------------------+
+|                         storage.c                        |
+|                 Persistent file operations               |
++----------------------------------------------------------+
+
+This diagram is a conceptual view. Exact call relationships depend on the
+implementation in the final source files.
+
+3. MODULE DESCRIPTIONS
+----------------------
+
+3.1 app.c — Application Entry Point
+    - Contains main().
+    - Creates or initializes the hospital state.
+    - Starts the main application/menu flow.
+    - Releases allocated resources when the program exits, if implemented.
+
+3.2 hospital.c / hospital.h — Application Coordination
+    - Defines or coordinates the overall hospital state.
+    - Connects menu actions to the relevant modules.
+    - Initializes records, queues, and storage.
+    - Provides the main user interaction flow.
+
+3.3 patient_record.c / patient_record.h — Patient Records
+    - Defines the patient record structure.
+    - Uses a singly linked list for patient records.
+    - Supports record operations such as adding, searching, counting, displaying,
+      deleting, and freeing list memory, where those functions are provided.
+    - Linked-list nodes are allocated dynamically, so allocated memory should be
+      released when no longer needed.
+
+3.4 doctor_registry.c / doctor_registry.h — Doctor Registry
+    - Maintains doctor details in a registry.
+    - Provides operations for registering and listing doctors, as implemented.
+    - If a fixed-size array is used, the registry has a maximum capacity that
+      should be checked before inserting a new doctor.
+
+3.5 waiting_room.c / waiting_room.h — Normal Waiting Queue
+    - Implements a circular array queue.
+    - Uses FIFO (First In, First Out) behavior.
+    - New entries are added at the rear and the next entry is removed from the
+      front.
+    - A circular queue reuses array positions after entries are removed.
+    - Enqueue and dequeue are typically O(1).
+
+3.6 emergency_room.c / emergency_room.h — Emergency Priority Queue
+    - Holds emergency entries according to the urgency value used by the program.
+    - The implementation inserts entries in priority order.
+    - Verify the exact priority convention in the source code before describing
+      it in a presentation. In the current design notes, a smaller urgency number
+      is intended to represent a higher priority.
+    - If the queue is array-based and insertion shifts entries, insertion can
+      take O(n), while removing the first entry can take O(1) when implemented
+      by shifting or updating the front appropriately.
+
+3.7 sorting.c / sorting.h — Sorting
+    - Provides merge-sort-based sorting of patient records by age, if included in
+      the final source.
+    - Merge sort has O(n log n) time complexity and typically requires O(n)
+      auxiliary memory.
+    - Sorting should not unintentionally corrupt the original linked list or
+      lose record fields.
+
+3.8 storage.c / storage.h — File Persistence
+    - Saves and loads supported patient and doctor records.
+    - Binary file I/O may be used by the implementation.
+    - The program must check file-open and read/write results to handle failures.
+    - Binary files are implementation-specific and should not be treated as
+      portable interchange files across arbitrary compiler or structure changes.
+
+4. DATA STRUCTURES
+------------------
+
+A. Patient linked list
+   Purpose: keep a variable number of patient records.
+   Typical operations:
+     - Search by patient ID: O(n)
+     - Insert at head: O(1), if implemented that way
+     - Traverse/display all records: O(n)
+     - Delete by ID: O(n)
+
+B. Doctor registry
+   Purpose: maintain a bounded collection of doctor records.
+   If implemented as an array:
+     - Access by index: O(1)
+     - Search by a field: O(n)
+     - Insert: O(1) when appending and capacity is available
+
+C. Circular FIFO queue
+   Purpose: process normal waiting-room entries in arrival order.
+   Typical enqueue: O(1)
+   Typical dequeue: O(1)
+
+D. Emergency priority queue
+   Purpose: order emergency entries using an urgency value.
+   Complexity depends on the exact implementation. An ordered array often needs
+   O(n) insertion and O(1) removal from the front.
+
+E. Merge sort
+   Purpose: sort a list or array of patient records by age.
+   Typical time: O(n log n)
+   Typical auxiliary memory: O(n)
+
+5. TYPICAL PROGRAM FLOW
+-----------------------
+
+   Start
+     |
+     v
+   Initialize hospital state and modules
+     |
+     v
+   Load saved records, if available
+     |
+     v
+   Display menu
+     |
+     v
+   User selects an operation
+     |
+     +--> Patient record operation
+     |
+     +--> Doctor registry operation
+     |
+     +--> Normal waiting queue operation
+     |
+     +--> Emergency queue operation
+     |
+     +--> Search or sort operation
+     |
+     +--> Save or exit operation
+     |
+     v
+   Return to menu until exit is selected
+     |
+     v
+   Save supported data and release resources
+     |
+     v
+   End
+
+The exact order of saving, loading, and cleanup should be confirmed against the
+final implementation.
+
+6. FILE RELATIONSHIPS
+---------------------
+
+app.c
+  -> hospital.h
+  -> hospital.c (linked at build time)
+
+hospital.c
+  -> patient_record.h
+  -> doctor_registry.h
+  -> waiting_room.h
+  -> emergency_room.h
+  -> sorting.h
+  -> storage.h
+
+Each implementation file includes its own header and any other headers needed
+for shared types or function declarations. Header guards should be used to
+prevent repeated inclusion.
+
+7. BUILD AND EXECUTION
+----------------------
+
+1. Keep all .c and .h files in the project folder.
+2. Open Dev-C++.
+3. Create a C Console Application or open the provided project file.
+4. Add all required .c files to the build.
+5. Ensure that only app.c supplies main().
+6. Compile and resolve any compiler or linker errors.
+7. Run and test each menu option.
+8. Keep the program's data files in the expected working directory.
+
+Do not compile each module independently as a separate executable. The source
+files form one program and must be linked together.
+
+8. ERROR HANDLING AND RELIABILITY
+---------------------------------
+
+The implementation should:
+- Validate user input before using it.
+- Check queue capacity and empty-queue conditions.
+- Check linked-list allocation results.
+- Check file-open, file-read, and file-write results.
+- Avoid duplicate patient IDs where uniqueness is required.
+- Handle missing data files as a first-run condition.
+- Release dynamically allocated memory on exit.
+- Explain invalid menu choices clearly.
+
+Review the source code to confirm which safeguards are already present.
+
+9. SECURITY AND SCOPE
+---------------------
+
+This educational project is not designed for real patient care. It may lack
+authentication, encryption, audit trails, concurrency control, robust backups,
+and formal clinical validation. Do not enter real sensitive patient information.
+The emergency queue is a programming demonstration, not a medically validated
+triage system.
+
+10. FUTURE IMPROVEMENTS
+----------------------
+
+- Validate all input and provide consistent error messages.
+- Use a documented, versioned storage format.
+- Add user roles and access controls.
+- Add appointment scheduling and reporting.
+- Add automated tests for queue, sorting, search, and storage operations.
+- Add a graphical interface if required by the project.
+- Have qualified clinical professionals validate any real-world triage rules.
+
+END OF DOCUMENT
