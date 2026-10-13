@@ -1,0 +1,23 @@
+SMART HOSPITAL - AI INTEGRATION NOTES
+
+Changes made:
+1. Added ai_triage.c and ai_triage.h from the supplied AI module archive.
+2. Added aiClassificationMenu() in app.c. It collects the five model features,
+   validates that each value is 0 or 1, and calls ai_demo_print_result().
+3. Added main-menu option 6 to invoke the AI demonstration.
+4. Kept AI output separate from waiting-room and emergency-queue decisions.
+5. Corrected escaped newline output in ai_triage.c so messages display on
+   separate lines.
+6. Added README.md with module descriptions, build command, limitations, and
+   basic integration test results.
+
+Build:
+gcc -std=c99 -Wall -Wextra -pedantic app.c hospital.c patient_record.c doctor_registry.c waiting_room.c emergency_room.c storage.c ai_triage.c -lm -o smart_hospital
+
+Important:
+- Do not define AI_TRIAGE_STANDALONE for the integrated application.
+- The Naive Bayes training examples are fabricated educational data.
+- Never use this model for real diagnosis, treatment, or patient priority.
+- Plagiarism/similarity results depend on the institution's tools and sources;
+  no particular score can be guaranteed. Review and understand the code, and
+  acknowledge reused components as required by your course.
