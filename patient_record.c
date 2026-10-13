@@ -16,6 +16,7 @@ static PatientNode *makeNode(Patient p)
 void patientBookInit(PatientBook *book)
 {
     book->first = NULL;
+    book->last = NULL;
     book->count = 0;
 }
 
@@ -28,6 +29,7 @@ void patientBookFree(PatientBook *book)
         cur = next;
     }
     book->first = NULL;
+    book->last = NULL;
     book->count = 0;
 }
 
@@ -53,14 +55,12 @@ int addPatient(PatientBook *book, Patient p)
     if (n == NULL)
         return 0;
 
-    if (book->first == NULL) {
+    if (book->last == NULL) {
         book->first = n;
     } else {
-        PatientNode *cur = book->first;
-        while (cur->next != NULL)
-            cur = cur->next;
-        cur->next = n;
+        book->last->next = n;
     }
+    book->last = n;
 
     book->count++;
     return 1;
@@ -164,4 +164,9 @@ void sortPatientsById(PatientBook *book)
 
         book->first = newHead;
     }
+
+    /* Sorting changes node order; restore the cached tail invariant. */
+    book->last = book->first;
+    while (book->last != NULL && book->last->next != NULL)
+        book->last = book->last->next;
 } 
