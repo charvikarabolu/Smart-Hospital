@@ -5,6 +5,7 @@
 void doctorRegistryInit(DoctorRegistry *registry)
 {
     registry->front = NULL;
+    registry->back = NULL;
     registry->size = 0;
 }
 
@@ -17,6 +18,7 @@ void doctorRegistryFree(DoctorRegistry *registry)
         p = next;
     }
     registry->front = NULL;
+    registry->back = NULL;
     registry->size = 0;
 }
 
@@ -34,7 +36,6 @@ Doctor *findDoctor(DoctorRegistry *registry, int id)
 int registerDoctor(DoctorRegistry *registry, Doctor d)
 {
     DoctorNode *n;
-    DoctorNode *tail;
 
     if (findDoctor(registry, d.id) != NULL)
         return 0;
@@ -46,14 +47,12 @@ int registerDoctor(DoctorRegistry *registry, Doctor d)
     n->data = d;
     n->next = NULL;
 
-    if (registry->front == NULL) {
+    if (registry->back == NULL) {
         registry->front = n;
     } else {
-        tail = registry->front;
-        while (tail->next != NULL)
-            tail = tail->next;
-        tail->next = n;
+        registry->back->next = n;
     }
+    registry->back = n;
 
     registry->size++;
     return 1;
