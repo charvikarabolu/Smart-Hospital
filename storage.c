@@ -3,7 +3,7 @@
 
 int savePatients(const PatientBook *book, const char *filename)
 {
-    FILE *fp = fopen(filename, "w");
+    FILE *fp = fopen("data/patient.dat", "w");
     const PatientNode *p;
 
     if (fp == NULL)
@@ -23,7 +23,7 @@ int savePatients(const PatientBook *book, const char *filename)
 
 int loadPatients(PatientBook *book, const char *filename)
 {
-    FILE *fp = fopen(filename, "r");
+    FILE *fp = fopen("data/patient.dat", "r");
     Patient p;
 
     if (fp == NULL)
@@ -39,7 +39,7 @@ int loadPatients(PatientBook *book, const char *filename)
 
 int saveDoctors(const DoctorRegistry *registry, const char *filename)
 {
-    FILE *fp = fopen(filename, "w");
+    FILE *fp = fopen("data/doctor.dat", "w");
     const DoctorNode *p;
 
     if (fp == NULL)
@@ -59,7 +59,7 @@ int saveDoctors(const DoctorRegistry *registry, const char *filename)
 
 int loadDoctors(DoctorRegistry *registry, const char *filename)
 {
-    FILE *fp = fopen(filename, "r");
+    FILE *fp = fopen("data/doctor.dat", "r");
     Doctor d;
 
     if (fp == NULL)
