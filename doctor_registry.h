@@ -18,6 +18,7 @@ typedef struct DoctorNode {
 
 typedef struct {
     DoctorNode *front;
+    DoctorNode *back; /* permits constant-time registration at the end */
     int size;
 } DoctorRegistry;
 
