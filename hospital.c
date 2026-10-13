@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "hospital.h"
-
+#include "ai_triage.h"
 void hospitalInit(HospitalState *h)
 {
     patientBookInit(&h->patients);
