@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "hospital.h"
 #include "storage.h"
-
+#include "ai_triage.h"
 static void readLine(char *text, int size)
 {
     int ch;
@@ -202,6 +202,35 @@ static void queueMenu(HospitalState *h)
     } while (choice != 0);
 }
 
+
+/*
+ * Runs the classroom AI classifier independently of queue management.
+ * The prediction is informational only and never changes queue priority.
+ */
+static void aiClassificationMenu(void)
+{
+    AIFeatures features;
+
+    printf("\n--- AI Classification Demonstration ---\n");
+    printf("For this demo, enter 0 for No or 1 for Yes.\n");
+    printf("This is a synthetic classroom model, not medical advice.\n");
+
+    features.fever = readInt("Fever? (0/1): ");
+    features.cough = readInt("Cough? (0/1): ");
+    features.breathing_difficulty =
+        readInt("Breathing difficulty? (0/1): ");
+    features.severe_pain = readInt("Severe pain? (0/1): ");
+    features.confusion = readInt("Confusion? (0/1): ");
+
+    if (!ai_features_valid(&features)) {
+        printf("Invalid input: each answer must be 0 or 1.\n");
+        return;
+    }
+
+    ai_demo_print_result(&features);
+    printf("A qualified staff member must make all real care decisions.\n");
+}
+
 int main(void)
 {
     HospitalState hospital;
@@ -218,6 +247,7 @@ int main(void)
         printf("3. Patient flow / queues\n");
         printf("4. Save data\n");
         printf("5. Load data\n");
+        printf("6. AI classification demonstration\n");
         printf("0. Exit\n");
 
         choice = readInt("Choice: ");
@@ -247,6 +277,9 @@ int main(void)
             printf("Doctors: %s\n",
                    loadDoctors(&hospital.doctors, "doctors.dat")
                    ? "loaded" : "file unavailable");
+            break;
+        case 6:
+            aiClassificationMenu();
             break;
         }
     } while (choice != 0);
