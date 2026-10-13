@@ -19,6 +19,7 @@ typedef struct PatientNode {
 
 typedef struct {
     PatientNode *first;
+    PatientNode *last; /* cached end node avoids rescanning on every insert */
     int count;
 } PatientBook;
 
